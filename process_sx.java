@@ -15,8 +15,15 @@ public class process_sx {
                         "superuser",
                         "askubuntu"
                        };
-    public static String _SITE = "";
+   public static String[] _ENTITIES = {
+                        "questions",
+                        "answers",
+                        "comments",
+                        "posts" 
+                       };
+    public static String _ENTITY = "";
     public static String _TAGS = "";
+    public static String _SITE = "";
     public static int _MINUS_MONTHS = 0;
 
     public final static void main(String[] args) throws Exception {
@@ -36,9 +43,11 @@ public class process_sx {
       response = sxClient.getResponse("");
       sxClient.showResults( response );
 
-      String target = "questions";
-      String query = target + "?tag=" + _TAGS + 
-                     "&min=" + fromDate + "&max=" + toDate + "&site=" + _SITE;
+      String query = _ENTITY + 
+                     "?tag=" + _TAGS + 
+                     "&min=" + fromDate + 
+                     "&max=" + toDate + 
+                     "&site=" + _SITE;
       response = sxClient.getResponse(query);
       String results = sxClient.getResults( response );
       System.out.println("--------------------------------");
@@ -50,10 +59,11 @@ public class process_sx {
 
     // I am sure there are better ways - 
     public static boolean validate( String[] args ) {
-      if (args.length != 6) return false;
+      if (args.length != 8) return false;
       if (!args[0].equals("-s") && 
           !args[2].equals("-t") && 
-          !args[4].equals("-m"))
+          !args[4].equals("-m") &&
+          !args[6].equals("-e"))
          return false; 
 
       for ( String site : _SITES ) {
@@ -73,21 +83,33 @@ public class process_sx {
         return false;
       }
 
+      for ( String entity : _ENTITIES ) {
+        if (entity.startsWith(args[7])) _ENTITY = entity;
+      }
+      if (_ENTITY.equals("")) {
+        System.out.println("%% Bad entity - q, a, c, p ");
+        return false;
+      }
+
       return true;
     }
 
     public static void usage() {
-       System.out.println("usage: java process_sx -s <site> -t <tag(s)> -m <months> ");
+       System.out.println("usage: java process_sx -s <site> -t <tag(s)> -m <months> -e <entity>");
      
        System.out.println("       <site>: (st)ackexchange");
        System.out.println("               (se)rverfault");
        System.out.println("               (su)peruser");
        System.out.println("     <tag(s)>: free format");
        System.out.println("     <months>: go back m months");
+       System.out.println("     <entity>: (q)uestions");
+       System.out.println("               (a)nswers");
+       System.out.println("               (c)omments");
+       System.out.println("               (p)osts");
        System.out.println("");
        System.out.println("   Start Date: today - 30*months days ");
        System.out.println("     End Date: today");
-       System.out.println("ex: java process_sx -s st -t oracle -m 12");
+       System.out.println("ex: java process_sx -s st -t oracle -m 12 -e q");
        System.out.println("get all questions tagged oracle for last year");
        
        System.exit(0);
