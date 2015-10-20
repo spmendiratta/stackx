@@ -44,9 +44,6 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 public class StackXClient {
-    String _BASE_URL = "https://api.stackexchange.com/2.2/";
-    String _INFO = "info?site=stackoverflow";
-    String _REQ = "";
     DefaultHttpClient httpclient;
 
     public StackXClient() {
@@ -93,13 +90,12 @@ public class StackXClient {
     }
 
     public HttpResponse getResponse( String request ) {
-        _REQ = request;
-        if (request.equals("")) _REQ = _INFO;
         HttpResponse response = null;
+        if (request.equals("")) return null;
 
         try {
-          HttpGet httpget = new HttpGet(_BASE_URL + _REQ);
-          System.out.println("Executing request " + httpget.getURI());
+          HttpGet httpget = new HttpGet(request);
+          System.out.println("@@ executing request: \n" + httpget.getURI());
           response = httpclient.execute(httpget);
         } catch (IOException e) {
             System.out.println("%%http getResponse exception  " + e);
