@@ -6,7 +6,18 @@
 */
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Iterator;
 import java.io.IOException;
+import org.apache.http.HttpResponse;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import org.apache.http.HttpResponse;
 public class process_sx {
    public static String[] _SITES = {
@@ -16,17 +27,16 @@ public class process_sx {
                         "askubuntu"
                        };
    public static String[] _QUERIES = {
-                        "questions/answered",
+                        "questions",
                         "answers",
                         "comments",
                         "posts" 
                        };
-    public static String _BASE_URL = "https://api.stackexchange.com/2.2/";
-    public static String _INFO = "info?site=stackoverflow";
     public static String _QUERY = "";
     public static String _TAGS = "";
     public static String _SITE = "";
     public static int _MINUS_MONTHS = 0;
+    public static StackXClient  sxClient = new StackXClient();
 
     public final static void main(String[] args) throws Exception {
      if (validate( args )) { 
@@ -39,14 +49,12 @@ public class process_sx {
       calendar.add(Calendar.DATE, -_MINUS_MONTHS*30);
       long fromDate = calendar.getTimeInMillis() / 1000;
 
-      StackXClient  sxClient = new StackXClient();
 
       HttpResponse  response;
-      // response = sxClient.getResponse(_BASE_URL + _INFO);
+      // response = sxClient.getResponse("");
       // sxClient.showResults( response );
 
-      String query = _BASE_URL + 
-                     _QUERY + 
+      String query = _QUERY + 
                      "?tagged=" + _TAGS + 
                      "&fromdate=" + fromDate + 
                      "&todate=" + toDate + 
@@ -56,13 +64,114 @@ public class process_sx {
                      "&site=" + _SITE;
       response = sxClient.getResponse(query);
       String results = sxClient.getResults( response );
-      System.out.println(results);
+
+      String f = _SITE + "_" + _TAGS + ".json";
+      String fname = f.replaceAll(";", "_");
+      writeToFile(fname, query, results);
+      parseStackXJson( fname );
       
       sxClient.shutdown();
      } else usage();
     }
 
-    // I am sure there are better ways - 
+    private static void writeToFile(String fname, String query, String results) {
+        BufferedWriter writer = null;
+        try {
+
+            File logFile = new File(fname);
+            System.out.println("@@saving results to:\n" + logFile.getCanonicalPath());
+            writer = new BufferedWriter(new FileWriter(logFile));
+
+            // prepend some information first to results coming back ferom sx`
+            String qt = "\"";
+            writer.write("{\n");
+            writer.write("  " + qt + "_query" +  qt + ": " + qt + StackXClient._BASE_URL + query + qt + ",\n");
+            writer.write("  " + qt + "_site" +   qt + ": " + qt +_SITE + qt + ",\n");
+            //
+            writer.write(results.substring(2)); // Skip {\n from results
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                writer.close();
+            } catch (Exception e) {
+            }
+        }
+    }
+
+    private static void parseStackXJson( String fname ) {
+        JSONParser parser = new JSONParser();
+        try {
+            Object obj = parser.parse(new FileReader( fname ));
+            JSONObject jsonObject = (JSONObject)obj;
+
+            JSONArray qlist = (JSONArray) jsonObject.get("items");
+            for (int i = 0; i < qlist.size(); i++) {
+                JSONObject iobj = (JSONObject) qlist.get(i);
+
+                String title = (String)iobj.get("title");
+                long creation_date = (long)iobj.get("creation_date");
+                String link = (String)iobj.get("link");
+                JSONArray tag_array = (JSONArray)iobj.get("tags");
+                String tags = "";
+                for (int j = 0; j < tag_array.size(); j++) {
+                    tags += (String)tag_array.get(j) + ";";
+                }
+                String body = (String)iobj.get("body");
+                Long question_id = (Long)iobj.get("question_id");
+                Boolean is_answered = (Boolean)iobj.get("is_answered");
+                Long accepted_answer_id = (Long)iobj.get("accepted_answer_id");
+                if (is_answered && accepted_answer_id != null) {
+                  System.out.println(title);
+                  System.out.println(creation_date);
+                  System.out.println(link);
+                  System.out.println(tags);
+                  System.out.println(question_id);
+                  // System.out.println(body);
+                  System.out.println(accepted_answer_id);
+                  System.out.println(getAnswerBody(accepted_answer_id, "stackoverflow"));
+                  System.out.println("____");
+                  sleep(500);   // not to overwhelm stockexchange site
+
+                  System.exit(0);
+                } 
+            } // for 
+        } catch (Exception e) {
+            System.out.println("%%parseStackXJson error ");
+            e.printStackTrace();
+        }
+    }
+
+    private static String getAnswerBody( long accepted_answer_id, String site ) {
+        String body = "";
+        JSONParser parser = new JSONParser();
+        try {
+            String query = "answers/" + accepted_answer_id +  
+                           "?filter=withbody&site=" + site;
+            HttpResponse response = sxClient.getResponse(query);
+            String results = sxClient.getResults( response );
+
+            JSONObject jsonObj = (JSONObject)parser.parse(results);
+            JSONArray qlist = (JSONArray) jsonObj.get("items");
+            jsonObj = (JSONObject) qlist.get(0);
+
+            body = (String)jsonObj.get("body");
+        } catch (Exception e) {
+            System.out.println("%%parseStackXJson getAnswerBody ");
+            e.printStackTrace();
+        }
+        return body;
+    }
+
+    private static void sleep(int msecs ) {
+      try {
+          Thread.sleep(msecs);           
+      } catch(InterruptedException ex) {
+          Thread.currentThread().interrupt();
+      }
+    }
+
+    // there are better ways - 
     public static boolean validate( String[] args ) {
       if (args.length != 8) return false;
       if (!args[0].equals("-s") ||
@@ -122,4 +231,3 @@ public class process_sx {
        System.exit(0);
     }
 }
-
