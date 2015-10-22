@@ -67,8 +67,12 @@ public class process_sx {
 
       String f = _SITE + "_" + _TAGS + ".json";
       String fname = f.replaceAll(";", "_");
+
       writeToFile(fname, query, results);
-      parseStackXJson( fname );
+      JSONObject _obj = parseStackXJson( fname );
+
+      fname = fname.replace(".json", "_Final.json");
+      writeToFinalJSONFile( fname, _obj );
       
       sxClient.shutdown();
      } else usage();
@@ -77,7 +81,6 @@ public class process_sx {
     private static void writeToFile(String fname, String query, String results) {
         BufferedWriter writer = null;
         try {
-
             File logFile = new File(fname);
             System.out.println("@@saving results to:\n" + logFile.getCanonicalPath());
             writer = new BufferedWriter(new FileWriter(logFile));
@@ -89,28 +92,27 @@ public class process_sx {
             writer.write("  " + qt + "_site" +   qt + ": " + qt +_SITE + qt + ",\n");
             //
             writer.write(results.substring(2)); // Skip {\n from results
+            writer.close();
         } catch (Exception e) {
+            System.out.println("%%writeToFile error ");
             e.printStackTrace();
-        } finally {
-            try {
-                writer.close();
-            } catch (Exception e) {
-            }
-        }
+        } 
     }
 
-    private static void parseStackXJson( String fname ) {
+    private static JSONObject parseStackXJson( String fname ) {
+        JSONObject _obj =  new JSONObject();
         JSONParser parser = new JSONParser();
         try {
-            Object obj = parser.parse(new FileReader( fname ));
-            JSONObject jsonObject = (JSONObject)obj;
+            Object fobj = parser.parse(new FileReader( fname ));
+            JSONObject jsonObject = (JSONObject)fobj;
 
             JSONArray qlist = (JSONArray) jsonObject.get("items");
+            JSONArray out_list = new JSONArray();
             for (int i = 0; i < qlist.size(); i++) {
                 JSONObject iobj = (JSONObject) qlist.get(i);
 
                 String title = (String)iobj.get("title");
-                long creation_date = (long)iobj.get("creation_date");
+                Long creation_date = (Long)iobj.get("creation_date");
                 String link = (String)iobj.get("link");
                 JSONArray tag_array = (JSONArray)iobj.get("tags");
                 String tags = "";
@@ -121,33 +123,55 @@ public class process_sx {
                 Long question_id = (Long)iobj.get("question_id");
                 Boolean is_answered = (Boolean)iobj.get("is_answered");
                 Long accepted_answer_id = (Long)iobj.get("accepted_answer_id");
-                if (is_answered && accepted_answer_id != null) {
-                  System.out.println(title);
-                  System.out.println(creation_date);
-                  System.out.println(link);
-                  System.out.println(tags);
-                  System.out.println(question_id);
-                  // System.out.println(body);
-                  System.out.println(accepted_answer_id);
-                  System.out.println(getAnswerBody(accepted_answer_id, "stackoverflow"));
-                  System.out.println("____");
-                  sleep(500);   // not to overwhelm stockexchange site
 
-                  System.exit(0);
+                // capture only answered questions
+                if (is_answered && accepted_answer_id != null) {
+                   JSONObject obj = new JSONObject();
+                   obj.put("title", title);
+                   obj.put("creation_date", creation_date);
+                   obj.put("link", link);
+                   obj.put("tags", tags);
+                   obj.put("question_id", question_id);
+                   obj.put("question", body.substring(0, 20) + " ... ");
+                   obj.put("accepted_answer_id", accepted_answer_id);
+                   String answer = getAnswerBody(accepted_answer_id);
+                   obj.put("answer", answer.substring(0, 20) + " ... ");
+                   
+                   out_list.add( obj );
+                   sleep(200);   // not to overwhelm stockexchange site
                 } 
             } // for 
+            _obj.put("cases", out_list);
         } catch (Exception e) {
             System.out.println("%%parseStackXJson error ");
             e.printStackTrace();
         }
+        return _obj;
     }
 
-    private static String getAnswerBody( long accepted_answer_id, String site ) {
+    private static void writeToFinalJSONFile( String fname, JSONObject obj ) {
+        BufferedWriter writer = null;
+        try {
+            File logFile = new File(fname);
+            System.out.println("@@saving final results to:\n" + logFile.getCanonicalPath());
+            writer = new BufferedWriter(new FileWriter(logFile));
+
+            JSONWriter json_writer = new JSONWriter(); // this writer adds indentation
+            obj.writeJSONString(json_writer);
+            writer.write(json_writer.toString());
+            writer.close();
+        } catch (Exception e) {
+            System.out.println("%%writeToFinalJSONFile error ");
+            e.printStackTrace();
+        } 
+    }
+
+    private static String getAnswerBody( long accepted_answer_id ) {
         String body = "";
         JSONParser parser = new JSONParser();
         try {
             String query = "answers/" + accepted_answer_id +  
-                           "?filter=withbody&site=" + site;
+                           "?filter=withbody&site=" + _SITE;
             HttpResponse response = sxClient.getResponse(query);
             String results = sxClient.getResults( response );
 
@@ -166,8 +190,8 @@ public class process_sx {
     private static void sleep(int msecs ) {
       try {
           Thread.sleep(msecs);           
-      } catch(InterruptedException ex) {
-          Thread.currentThread().interrupt();
+      } catch(InterruptedException e) {
+          e.printStackTrace();
       }
     }
 
