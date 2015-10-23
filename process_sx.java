@@ -236,7 +236,6 @@ public class process_sx {
 
     public static void usage() {
        System.out.println("usage: java process_sx -s <site> -t <tag(s)> -m <months> -q <query>");
-     
        System.out.println("       <site>: (st)ackexchange");
        System.out.println("               (se)rverfault");
        System.out.println("               (su)peruser");
@@ -250,7 +249,7 @@ public class process_sx {
        System.out.println("   Start Date: today - 30*months days ");
        System.out.println("     End Date: today");
        System.out.println("ex: java process_sx -s st -t \"oracle;linux\" -m 12 -q q");
-       System.out.println("get all questions tagged oracle&linux for last year");
+       System.out.println("get all questions from site stackexchange tagged oracle&linux for last year");
        
        System.exit(0);
     }
