@@ -132,10 +132,10 @@ public class process_sx {
                    obj.put("link", link);
                    obj.put("tags", tags);
                    obj.put("question_id", question_id);
-                   obj.put("question", body.substring(0, 20) + " ... ");
+                   obj.put("question", body);
                    obj.put("accepted_answer_id", accepted_answer_id);
                    String answer = getAnswerBody(accepted_answer_id);
-                   obj.put("answer", answer.substring(0, 20) + " ... ");
+                   obj.put("answer", answer);
                    
                    out_list.add( obj );
                    sleep(200);   // not to overwhelm stockexchange site

@@ -1,9 +1,9 @@
-# stackx
-# Add apache http client jars to CLASSPATH (jars in ./jars)
+_stackx
+_Add apache http client jars to CLASSPATH (jars in ./jars)
 (Site: https://hc.apache.org/httpcomponents-client-4.5.x/download.html)
 
-javac *.java
-java process_sx
+i_javac *.java
+_java process_sx
 
 <<
 usage: java process_sx -s <site> -t <tag(s)> -m <months> -q <query>
@@ -16,7 +16,6 @@ usage: java process_sx -s <site> -t <tag(s)> -m <months> -q <query>
                (a)nswers
                (c)omments
                (p)osts
-
    Start Date: today - 30*months days 
      End Date: today
 
@@ -28,4 +27,3 @@ stack_excahnge_oracle_linux.json (back from stackexchange)
 stack_excahnge_oracle_linux_Final.json (file with answers where a question is answered and 
 accepted_question_id is not null)
 >>
-
