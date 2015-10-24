@@ -2,7 +2,7 @@ _stackx
 _Add apache http client jars to CLASSPATH (jars in ./jars)
 (Site: https://hc.apache.org/httpcomponents-client-4.5.x/download.html)
 
-i_javac *.java
+_javac *.java
 _java process_sx
 
 <<
