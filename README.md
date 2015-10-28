@@ -23,7 +23,7 @@ ex: java process_sx -s st -t "oracle;linux" -m 12 -q q
 get all questions from site stackexchange tagged oracle&linux for last year
 
 output files in this instance:
-stack_excahnge_oracle_linux.json (back from stackexchange)
-stack_excahnge_oracle_linux_Final.json (file with answers where a question is answered and 
+stack_exchange_oracle_linux.json (back from stackexchange)
+stack_exchange_oracle_linux_Final.json (file with answers where a question is answered and 
 accepted_question_id is not null)
 >>
