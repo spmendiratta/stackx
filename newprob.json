@@ -1,0 +1,82 @@
+{
+    "problemId": 123456,
+    "problemNumber": "123456", 
+    "problemType" : "Reference",
+    "problemSource" : "StackExchange",
+    "problemSourceType" : "Public",
+    "problemSourceURL": "SOURCE_URL",
+    "problemTitle": "PROBLEM_TITLE",
+    "problemTags": ["TAG1", "TAG2"],
+    "problemDescription": "PROBLEM_DESCRIPTION", 
+    "alerts": null,
+    "external_alerts": null,
+    "kpis" : null,
+    "hostName": null,
+    "priority": "P2",
+    "appComponent": null,
+    "applicationID": null,
+    "applicationName": null,
+    "problemTime": null,
+    "problemTimeString": null,
+    "problemStatus": "CLOSED",
+    "problemComments": null,
+    "context": [ 
+                       {"Database": "DB"}, 
+                       {"Application": "APP"}                
+               ],
+    "anomalies": [
+        {
+            "tierName": "Database",
+            "tierType" : "Database", 
+            "anomalyScore": "10",
+            "metricAnomalies": null,
+            "logAnomalies": {
+                   "rarePatterns": null,
+                   "unusualPatterns": null,
+                   "otherPatterns": [
+                       { "anomalyPatternID": 100,
+                         "upTick": false,
+                         "hostname": null,
+                         "displaypattern": "ERROR_MSG",
+                            "percentChange": 0,
+                            "hour": null,
+                            "pattern": "ERROR_MSG",
+                            "frequency": 1,
+                            "isClue": "true",
+                             "clueDisplayPosition": {
+                                        "left": 10,   
+                                        "top": 10 
+                              },
+                              "clueConnections" : null,
+                              "isFiltered": "false",
+                               "gobblerLogIdList": null
+                       }
+                   ]
+                }
+          }
+    ],
+    "solutions": [     
+        {
+            "description": "DESCRIPTION",
+            "suggestedBy": "AUTHOR",
+            "suggestedOn": "TIME_STAMP",
+            "reviewsAndRatings": [
+                {
+                    "comment": "COMMENT",
+                    "rating": 1
+                }
+            ],
+            "averageRating": 1,
+            "numberOfRatings" : 1,
+            "tags": null,
+            "annotations":null
+        }    
+    ],
+    "rootCauses": [
+        {
+            "cause": "CAUSE"
+        }
+    ],
+    "matchingProblemIDList": null,
+    "duplicateProblemIDList": null
+}
