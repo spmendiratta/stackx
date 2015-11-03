@@ -21,39 +21,48 @@
     "problemStatus": "CLOSED",
     "problemComments": null,
     "context": [ 
-                       {"Database": "DB"}, 
-                       {"Application": "APP"}                
-               ],
+           {"Application": null},
+           {"Database": null}, 
+           {"Network": null},
+           {"OS": null},
+           {"Overall": null}
+    ],
     "anomalies": [
         {
-            "tierName": "Database",
-            "tierType" : "Database", 
+            "tierName": "",
+            "tierType" : "",
             "anomalyScore": "10",
             "metricAnomalies": null,
-            "logAnomalies": {
+            "logAnomalies": 
+            {
                    "rarePatterns": null,
                    "unusualPatterns": null,
                    "otherPatterns": [
-                       { "anomalyPatternID": 100,
+                      { 
+                         "anomalyPatternID": 100,
                          "upTick": false,
                          "hostname": null,
                          "displaypattern": "ERROR_MSG",
-                            "percentChange": 0,
-                            "hour": null,
-                            "pattern": "ERROR_MSG",
-                            "frequency": 1,
-                            "isClue": "true",
-                             "clueDisplayPosition": {
-                                        "left": 10,   
-                                        "top": 10 
-                              },
-                              "clueConnections" : null,
-                              "isFiltered": "false",
-                               "gobblerLogIdList": null
-                       }
-                   ]
-                }
-          }
+                         "percentChange": 0,
+                         "hour": null,
+                         "pattern": "ERROR_MSG",
+                         "frequency": 1,
+                         "isClue": "true",
+                         "clueDisplayPosition": 
+                         {
+                             "left": 10,   
+                             "top": 10 
+                         },
+                         "clueConnections" : null,
+                         "isFiltered": "false",
+                         "gobblerLogIdList": null
+                      }
+                   ],
+                   "rareEventsList" : null,
+                   "unusualEventsList" : null,
+                   "otherEventsList": null
+            }
+        }
     ],
     "solutions": [     
         {
@@ -63,6 +72,8 @@
             "reviewsAndRatings": [
                 {
                     "comment": "COMMENT",
+                    "commentBy" : "AUTHOR",
+                    "commentOn" : "TIME_STAMP",
                     "rating": 1
                 }
             ],
