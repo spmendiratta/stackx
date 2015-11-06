@@ -1,0 +1,19 @@
+{ 
+     "anomalyPatternID": 100,
+     "upTick": false,
+     "hostname": null,
+     "displaypattern": "ERROR_MSG",
+     "percentChange": 0,
+     "hour": null,
+     "pattern": "ERROR_MSG",
+     "frequency": 1,
+     "isClue": "true",
+     "clueDisplayPosition": 
+     {
+        "left": 10,   
+        "top": 10 
+     },
+     "clueConnections" : null,
+     "isFiltered": "false",
+     "gobblerLogIdList": null
+}

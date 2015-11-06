@@ -1,0 +1,17 @@
+{
+   "description": "DESCRIPTION",
+   "suggestedBy": "AUTHOR",
+   "suggestedOn": "TIME_STAMP",
+   "reviewsAndRatings": [
+      {
+       "comment": "COMMENT",
+       "commentBy" : "AUTHOR",
+       "commentOn" : "TIME_STAMP",
+       "rating": 1
+      }
+   ],
+   "averageRating": 1,
+   "numberOfRatings" : 1,
+   "tags": null,
+   "annotations":null
+}    
