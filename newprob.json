@@ -23,7 +23,7 @@
     "context": [ 
            {"Application": null},
            {"Database": null}, 
-           {"Network": null},
+           {"Web": null},
            {"OS": null},
            {"Overall": null}
     ],

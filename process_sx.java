@@ -1,4 +1,6 @@
 /**
+  process_sx.java
+  sp-11152015
       getResponse("comments?order=desc&min=10&sort=votes&site=askubuntu");
       getResponse("tags?order=desc&site=serverfault"); // serverfault.tags
       getResponse("questions?site=serverfault");
@@ -22,6 +24,8 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.apache.http.HttpResponse;
+
+import org.apache.commons.lang3.StringUtils;
 public class process_sx {
    public static String[] _SITES = {
                         "stackoverflow",
@@ -37,21 +41,24 @@ public class process_sx {
                        };
     public static Hashtable contextHash = new Hashtable();
     public static String _QUERY = "";
-    public static String _TAGS = "";
+    public static String _QUERY_TAGS = "";
     public static String _SITE = "";
     public static int _MINUS_MONTHS = 0;
     public static StackXClient  sxClient = new StackXClient();
     public static String CASE_TEMPLATE_FILE =  "./newprob.json";
     public static String PATTERN_TEMPLATE_FILE =  "./genericPattern.json";
     public static String SOLUTION_TEMPLATE_FILE =  "./genericSolution.json";
+    public static String CONTEXT_TIER_FILE =  "./contextTier.json";
+
     public static JSONObject CASE_TEMPLATE_JSON =  new JSONObject();
     public static JSONObject PATTERN_TEMPLATE_JSON =  new JSONObject();
     public static JSONObject SOLUTION_TEMPLATE_JSON =  new JSONObject();
+    public static JSONObject CONTEXT_TIER_JSON =  new JSONObject();
 
-    public static String[] _CONTEXT = {
+    public static String[] _TIER = {
                              "Application",
                              "Database",
-                             "Network",
+                             "Web",
                              "OS",
                              "Overall"
                            };
@@ -72,7 +79,7 @@ public class process_sx {
       // sxClient.showResults( response );
 
       String query = _QUERY + 
-                     "?tagged=" + _TAGS + 
+                     "?tagged=" + _QUERY_TAGS + 
                      "&fromdate=" + fromDate + 
                      "&todate=" + toDate + 
                      "&sort=votes&order=desc" +
@@ -82,10 +89,10 @@ public class process_sx {
       response = sxClient.getResponse(query);
       String results = sxClient.getResults( response );
 
-      setContextHash();
       setJsonTemplates();
+      setContextHash();
 
-      String f = _SITE + "_" + _TAGS + ".json";
+      String f = _SITE + "_" + _QUERY_TAGS + ".json";
       String fname = f.replaceAll(";", "_");
 
       writeToFile(fname, query, results);
@@ -99,27 +106,11 @@ public class process_sx {
     }
 
     private static void setContextHash() {
-      contextHash.put("someApp", "Application");
-      contextHash.put("mongodb", "Database");
-      contextHash.put("postgresql", "Database");
-      contextHash.put("mysql", "Database");
-      contextHash.put("oracle", "Database");
-      contextHash.put("sql-server", "Database");
-      contextHash.put("cisco", "Network");
-      contextHash.put("dns", "Network");
-      contextHash.put("router", "Network");
-      contextHash.put("centos", "OS"); 
-      contextHash.put("debian", "OS"); 
-      contextHash.put("fedora", "OS"); 
-      contextHash.put("linux", "OS"); 
-      contextHash.put("osx", "OS"); 
-      contextHash.put("unix", "OS"); 
-      contextHash.put("redhat", "OS"); 
-      contextHash.put("ubuntu", "OS"); 
-      contextHash.put("windows", "OS"); 
-      contextHash.put("firewall", "Overall"); 
-      contextHash.put("performance", "Overall"); 
-      contextHash.put("security", "Overall"); 
+      JSONArray ja = (JSONArray)CONTEXT_TIER_JSON.get("context-tier");
+      for ( int i = 0; i < ja.size(); i++) {
+	JSONObject o = (JSONObject)ja.get(i);
+        contextHash.put((String)o.get("context"), (String)o.get("tier"));
+      }
     }
 
     private static void setJsonTemplates() {
@@ -131,6 +122,8 @@ public class process_sx {
             PATTERN_TEMPLATE_JSON = (JSONObject)fobj;
             fobj = parser.parse(new FileReader( SOLUTION_TEMPLATE_FILE ));
             SOLUTION_TEMPLATE_JSON = (JSONObject)fobj;
+            fobj = parser.parse(new FileReader( CONTEXT_TIER_FILE ));
+            CONTEXT_TIER_JSON = (JSONObject)fobj;
         } catch (Exception e) {
             System.out.println("%%setJsonCaseTemplate error ");
             e.printStackTrace();
@@ -182,6 +175,7 @@ public class process_sx {
                     tags += (String)tag_array.get(j) + ";";
                 }
                 String body = (String)iobj.get("body");
+                // spzz if (body != null) examineBody( body );
  
                 Long question_id = (Long)iobj.get("question_id");
                 Boolean is_answered = (Boolean)iobj.get("is_answered");
@@ -219,7 +213,6 @@ public class process_sx {
                    obj.put("answer", answer);
                    */
                    String answerURL = getAnswerURL(accepted_answer_id);
-
                    //((JSONObject)((JSONArray)(obj.get("solutions"))).get(0)).put("description", answerURL); // won't work
                    /*
                    JSONArray s_array = (JSONArray)(obj.get("solutions"));
@@ -263,6 +256,7 @@ public class process_sx {
         JSONObject jo = new JSONObject();
 
         Hashtable tagHash = new Hashtable();
+        /* sp-11172015 forget this
         for (int j = 0; j < tag_array.size(); j++) {
                String tag = (String)(tag_array.get(j));
                if (contextHash.containsKey(tag)) {
@@ -273,15 +267,25 @@ public class process_sx {
                      tagHash.put(val, newTag);
                    } else tagHash.put(val, tag);
                }
+        }
+        */
+        // sp-11172015 : just use query tags
+        StringTokenizer st = new StringTokenizer(_QUERY_TAGS, ";");
+        while (st.hasMoreElements()) {
+            String tag = (String)st.nextElement();
+            if (contextHash.containsKey(tag)) {
+                  String val = (String)contextHash.get(tag);
+                  tagHash.put(val, tag);
             }
+        }
 
-        for ( String context : _CONTEXT ) {
+        for ( String tier : _TIER ) {
             String cv = "";
-            if (tagHash.containsKey(context)) {
-                   cv = (String)tagHash.get(context);
+            if (tagHash.containsKey(tier)) {
+                   cv = (String)tagHash.get(tier);
             }
             jo = new JSONObject();
-            jo.put(context, cv);
+            jo.put(tier, cv);
             obj_a.add(jo);
         }
         return obj_a;
@@ -292,7 +296,6 @@ public class process_sx {
         jo.put("description", answerURL );
         return jo;
     }
-
 
     private static void writeToFinalJSONFile( String fname, JSONObject obj ) {
         BufferedWriter writer = null;
@@ -337,6 +340,20 @@ public class process_sx {
         return body;
     }
 
+
+    private static void examineBody( String body ) {
+        String[] errors = StringUtils.substringsBetween( body, "<code>", "code>");
+
+        if (errors != null) {
+          if (errors.length > 0) {
+             for ( int i = 0; i < errors.length; i++ ) {
+                 System.out.println("~~" + errors[i] );
+             }
+             System.out.println("______________________________");
+          }
+        }
+    }
+
     private static void sleep(int msecs ) {
       try {
           Thread.sleep(msecs);           
@@ -364,7 +381,7 @@ public class process_sx {
         return false;
       }
 
-      _TAGS = args[3];
+      _QUERY_TAGS = args[3];
 
       try {
          _MINUS_MONTHS = Integer.parseInt(args[5]);

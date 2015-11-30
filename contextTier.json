@@ -1,0 +1,27 @@
+{
+ "context-tier": [
+   {"context": "someApp", "tier": "Application"},
+   {"context": "mongodb", "tier": "Database"},
+   {"context": "mysql", "tier": "Database"},
+   {"context": "postgresql", "tier": "Database"},
+   {"context": "oracle", "tier": "Database"},
+   {"context": "sql-server", "tier": "Database"},
+   {"context": "apache", "tier": "Web"},
+   {"context": "dns", "tier": "Web"},
+   {"context": "router", "tier": "Web"},
+   {"context": "centos", "tier": "OS"},
+   {"context": "debian", "tier": "OS"},
+   {"context": "fedora", "tier": "OS"}, 
+   {"context": "linux", "tier": "OS"}, 
+   {"context": "osx", "tier": "OS"}, 
+   {"context": "redhat", "tier": "OS"}, 
+   {"context": "ubuntu", "tier": "OS"}, 
+   {"context": "unix", "tier": "OS"}, 
+   {"context": "windows", "tier": "OS"}, 
+   {"context": "amazon-ec2", "tier": "Overall"}, 
+   {"context": "database", "tier": "Overall"},
+   {"context": "firewall", "tier": "Overall"}, 
+   {"context": "performance", "tier": "Overall"},
+   {"context": "security", "tier": "Overall"} 
+  ]
+}
