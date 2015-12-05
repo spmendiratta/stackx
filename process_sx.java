@@ -37,7 +37,8 @@ public class process_sx {
                         "questions",
                         "answers",
                         "comments",
-                        "posts" 
+                        "posts", 
+                        "search/advanced" 
                        };
     public static Hashtable contextHash = new Hashtable();
     public static String _QUERY = "";
@@ -86,6 +87,8 @@ public class process_sx {
                      "&filter=withbody" +
                      "&pagesize=100" +
                      "&site=" + _SITE;
+      if (query.startsWith("search")) query += "&title=error";
+
       response = sxClient.getResponse(query);
       String results = sxClient.getResults( response );
 
@@ -412,6 +415,7 @@ public class process_sx {
        System.out.println("               (a)nswers");
        System.out.println("               (c)omments");
        System.out.println("               (p)osts");
+       System.out.println("               (s)search on <tags> + 'error' in title");
        System.out.println("");
        System.out.println("   Start Date: today - 30*months days ");
        System.out.println("     End Date: today");
