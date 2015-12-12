@@ -5,6 +5,12 @@
       getResponse("tags?order=desc&site=serverfault"); // serverfault.tags
       getResponse("questions?site=serverfault");
 
+
+  Main module to query stackExchange
+  Task remainjng : Text Parsing for Symptoms
+                   grep error
+                   grep regex -999999 {symbolic of error}
+                   try <code> </code>
 */
 import java.util.Calendar;
 import java.util.Date;
