@@ -7,11 +7,12 @@
 
 
   Main module to query stackExchange
-  Task remaining : Text Parsing for Symptoms
+  Tasks remaining : Text Parsing for Symptoms
                    grep error
                    grep regex -999999 {symbolic of error}
                    try <code> </code>
                    Any online RESTful text extraction engines; Watson; DeepDive; DataNinja
+                   Automate : cycle through combination of tags; search error
 */
 import java.util.Calendar;
 import java.util.Date;
